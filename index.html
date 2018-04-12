@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <meta charset="utf8">
+    <meta charset="utf-8">
     <link rel="stylesheet" href="highlight/styles/monokai-sublime.css">
     <link rel="stylesheet" href="style.css">
   </head>
@@ -11,47 +11,35 @@
       <section>
         <h1>Beyond <code>console.log</code></h1>
         <h2>Making the most of your developer tools</h2>
+        <h3>(Adapted from Brian Brennan's <a href="https://brianloveswords.github.io/srccon-2016">2016 SRCCON session</a>)</h3>
       </section>
 
 
       <section>
-        <h1>Session Agenda</h1>
+        <h1>Agenda</h1>
         <ul>
-          <li><code>console</code> methods beyond <code>.log</code></li>
+          <li>Meet the console tab</li>
+          <ul>
+            <li>Part 1: <code>console</code> methods beyond <code>.log</code></li>
+            <li>Part 2: testing Parse.ly example code in the console</li>
+          </ul>
+          <li>Meet the network tab (refresher)</li>
+          <li>Meet the source tab</li>
           <li>How to read a stack trace</li>
           <li>Using the step debugger</li>
-          <li>Event Listener breakpoints</li>
-          <li>blackboxing</li>
-          <li>Surface overview of other parts of devtools</li>
+          <li>Event listener breakpoints</li>
         </ul>
       </section>
 
 
       <section>
-        <h1>Session Goal</h1>
-        <h2>Spark the 🔥 in your 💗 to explore your dev tools</h2>
+        <h1>Goal</h1>
+        <ul>
+          <li>Show off some cool but probably useless tricks</li>
+          <li>Provide some specific tips for quicker customer debugging</li>
+          <li>Spark the 🔥 in your 💗 to explore your dev tools and have fun with js</li>
+        </ul>
       </section>
-
-      <section>
-        <h1>Who am I?</h1>
-      </section>
-
-
-
-      <section>
-        <h1>Who are you?</h1>
-      </section>
-
-
-      <section>
-        <h1>
-          like follow subscribe at<br>
-          <a href="//brianloveswords.github.io/srccon-2016">
-            brianloveswords.github.io/srccon-2016
-          </a>
-        </h1>
-      </section>
-
 
 
       <section>
@@ -63,9 +51,17 @@
       <section>
         <h1>Opening up DevTools</h1>
         <h2>
-          View → Developer → Developer Tools<br>
-          Command + Option + I
+          Control + Shift + I (Linux)<br>
+          Command + Option + I (Mac)<br>
+          Right Click → Inspect<br>
+          View → Developer → Developer Tools
         </h2>
+      </section>
+
+
+      <section>
+        <h1>Meet the Console Tab</h1>
+        <h2>Part 1: A place for <a href="http://fandom.wikia.com/articles/7-anime-main-character-deaths-brought-fans-tears">errors, messages, warnings</a></h2>
       </section>
 
 
@@ -76,7 +72,6 @@
           Control + L
         </h2>
       </section>
-
 
 
       <!-- console.log  -->
@@ -110,7 +105,7 @@ console.log('%ca friggin travesty', 'font-size: 10em; color: red;');
       <section>
         <h1><code>console.dir()</code></h1>
         <h2>Alias for <code>console.log('%O', thing)</code></h2>
-        <p>When I'm logging objects, I tend to use this over console.log because I usually want to inspect properties and I care less about HTML representation.</p>
+        <p>Useful when you want to inspect properties and care less about HTML representation.</p>
         <pre><code class="js" contenteditable>
 // Explore the HTML contained in the document
 console.log(document);
@@ -119,7 +114,6 @@ console.log(document);
 console.dir(document);
         </code></pre>
       </section>
-
 
 
       <!-- console.info, console.warn  -->
@@ -135,7 +129,6 @@ console.warn('this could be an issue');
 console.warn('%calso supports formatters', 'color: #f0f');
         </code></pre>
       </section>
-
 
 
       <!-- console.info, console.warn  -->
@@ -161,9 +154,289 @@ let baz = function() {
 
 foo();
         </code></pre>
+        <h3>(We'll come back to these later)</h3>
 
       </section>
 
+
+      <section>
+        <h1>Meet the Console Tab</h1>
+        <h2>Part 2: Also a fully-functional REPL for JavaScript</h2>
+        <h3 id="restyler">We can interact with the existing page</h3>
+        <pre><code class="js" contenteditable>
+var restyler = document.getElementById('restyler');
+restyler.setAttribute('style','text-transform:uppercase;font-style:italic;color:orange')
+restyler.onclick = function() { this.setAttribute('style',''); }
+        </code></pre>
+        <h3>...or build something entirely from scratch</h3>
+      </section>
+
+
+      <section>
+        <h1>Time for some Parse.ly code</h1>
+      </section>
+
+
+      <section>
+        <h1>Aside: Global Variables and the <code>window</code> Object</h1>
+        <h2>Quiz: What's the difference between these two examples?</h2>
+        <pre><code class="js" contenteditable>
+// From the dynamic tracking docs
+PARSELY = {
+  autotrack: false,
+  dynamicTracking: true,
+  onload: function() {
+    console.log('Parse.ly tracker loaded')
+  }
+};
+console.log(PARSELY)
+        </code></pre>
+        <pre><code class="js" contenteditable>
+// From the segment tracking docs
+(function(w) {
+  w.PARSELY = {
+    autotrack: false,
+    segments: true,
+    onReady: function() {
+      console.log('Parse.ly tracker ready');
+    }
+  };
+})(window);
+console.log(window.PARSELY);
+        </code></pre>
+      </section>
+
+
+      <section>
+        <h1>We don't have Parse.ly tracking set up though</h1>
+        <h2>...but could we?</h2>
+        <pre><code class="js" contenteditable>
+(function(d) {
+  var site = "elevatedtoday.com",
+      b = d.body,
+      e = d.createElement("div"),
+      i = d.createElement("span");
+
+  i.setAttribute("data-parsely-site",site);
+  i.id = "parsely-cfg";
+  e.id = "parsely-root";
+  e.style.display = "none";
+  e.appendChild(i);
+  b.appendChild(e);
+})(document);
+(function(s, p, d) {
+  var h=d.location.protocol, i=p+"-"+s,
+      e=d.getElementById(i), r=d.getElementById(p+"-root"),
+      u=h==="https:"?"d1z2jf7jlzjs58.cloudfront.net"
+      :"static."+p+".com";
+  if (e) return;
+  e = d.createElement(s); e.id = i; e.async = true;
+  e.src = h+"//"+u+"/p.js"; r.appendChild(e);
+})("script", "parsely", document);
+        </code></pre>
+      </section>
+
+
+      <section>
+        <h1>A Reminder: The Parse.ly Tracker Doesn't Use <code>console.log</code></h1>
+        <pre><code class="js" contenteditable>
+PARSELY.console.msgs
+        </code></pre>
+      </section>
+
+
+      <section>
+        <h1>Refresher: The Network tab</h1>
+        <h2>Use regex for complex filtering</h2>
+        <pre><code>/(parsely)|(ga.js)|(google-analytics)|(b/ss)|(gaq)|(c9=&)/</code></pre>
+        <h3>Also check out James's <a href="https://github.com/Parsely/team_success/wiki/Confirming-tracking-with-Chrome-dev-tools">notes about network requests</a> in the team_success wiki</h3>
+      </section>
+
+
+      <section>
+        <h1>Where Do JavaScript Files Live?</h1>
+        <h2>The Sources tab, of course!</h2>
+      </section>
+
+
+      <section>
+        <h1>Meet the Sources Tab</h1>
+        <ul>
+          <li>Search! (both across and within files)</li>
+          <li>Pretty print!</li>
+          <li>Edit! (with some caveats)</li>
+          <ul>
+            <li>Network vs Filesystem vs Override</li>
+          </ul>
+        </ul>
+      </section>
+
+      
+      <section>
+        <h1>The Irreversable ➡️ of 🕐</h1>
+        <h2>What if we wanted to see what have happened if scripts had ran in a different order?</h2>
+        <h2>Can we ever go back to the way things were before?</h2>
+      </section>
+
+
+      <section>
+        <h1>NO!</h1>
+        <h2>(But we can do the next best thing... hit ⏸)</h2>
+      </section>
+
+
+      <section>
+        <h1><code>debugger</code></h1>
+        <pre><code class="js" contenteditable>
+// This program is broken, let's find out why
+let foo = function(input) {
+  console.info('entering foo, once again');
+  bar(`${input} ${input}`);
+}
+
+let bar = function(input) {
+  console.info('entering bar, pump up the world');
+  let parts = input.split(' ');
+  parts.push(parts[0]);
+  baz(parts.join(' '));
+}
+
+let baz = function(input) {
+  console.info('entering baz, watch my flow');
+
+  console.log(`🎶 ${input} you know that I'll be back 🎶`);
+}
+
+foo('return of the mack');
+        </code></pre>
+      </section>
+
+
+      <section>
+        <h1>Pause On Exception</h1>
+        <pre><code class="js" contenteditable>
+  // Make sure to turn on Pause on Exception first
+  let x = {howDoWeDoIt: this};
+
+  console.log('this is gonna happen');
+
+  undefined('i bet this is a function');
+
+  console.log('never gonna get here');
+        </code></pre>
+
+        <aside>
+          Here's where it's not useful: when the libraries you are using are
+          flagrant about letting exceptions run wild. blackboxing
+          can fix that.
+        </aside>
+      </section>
+
+
+
+      <section>
+        <h1><code>console.assert()</code></h1>
+        <pre><code class="js" contenteditable>
+let x = {howDoWeDoIt: this};
+
+console.assert(1 == 1, 'somehow math stopped working');
+
+console.assert(1 == 2, 'yep I guess math did stop working');
+
+console.log('assert does not cause abrupt completion');
+        </code></pre>
+      </section>
+
+
+
+      <section>
+        <h1>Event Listener Breakpoints</h1>
+        <pre><code class="js" contenteditable>
+document.body.addEventListener('mouseup', event => {
+  // remember to go into the Sources tab and turn on the mouseup
+  // event listener breakpoint. When it breaks, execution will be
+  // paused within this context.
+  let time = Date.now();
+  let element = event.target;
+  console.log(`${time}: %O`, element);
+});
+console.info('event listener added');
+        </code></pre>
+      </section>
+
+
+      <section>
+        <h1><code>blackboxing</code></h1>
+        <pre><code class="js" contenteditable>
+// This function is provided by the hot new 10x framework, 'chaos.js'.
+// It flips a coin and `throws` some unwanted saxophones on heads
+
+// To blackbox this dumb, dumb script, go to devtools settings,
+// look for "blackboxing" on the right navigation.
+chaos();
+        </code></pre>
+      </section>
+
+
+      <section>
+        <center>💗</center>
+      </section>
+      
+
+      <section>
+        <h1>⛏ even deeper...</h1>
+      </section>
+
+
+      <section>
+        <h1><code>console.time()<br>console.timeEnd()</code></h1>
+        <pre><code class="js" contenteditable>
+console.time('social-construct');
+
+// Multiple timers are totally fine as long as
+// they have different names
+console.time('message')
+console.info('time is a social construct');
+console.timeEnd('message')
+
+setTimeout(_ => {
+  console.info('%c...or is it?', 'font-style: italic');
+  console.timeEnd('social-construct');
+}, 2000)
+        </code></pre>
+      </section>
+
+
+
+      <section>
+        <h1><code>console.table()</code></h1>
+        <h2>Sortable data in the console</h2>
+        <pre><code class="js" contenteditable>
+// Remember to turn on async stack traces
+
+fetch('albums.json')
+  .then(response => response.json())
+  .then(albums => {
+    // Show everything
+    console.table(albums);
+
+    // Show only selected fields
+    console.table(albums, ['year']);
+  })
+  .catch(e => console.error(e))
+        </code></pre>
+        <aside>This uses the new <code>fetch</code> API which is way easier in simple cases than XHR, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">check out the docs on MDN</a>
+      </section>
+
+
+      <section>
+        <h1>💸 Cache Problems 💸</h1>
+        <ul>
+          <li>Network tab → Disable cache</li>
+          <li>Application tab → Clear storage</li>
+        </ul>
+        <aside>Especially useful when working with responsive images</aside>
+      </section>
 
       <!-- console.group  -->
       <section>
@@ -238,162 +511,6 @@ setInterval(_ => debug('module3', 'definitely aliens on the ship'), 5000);
         </code></pre>
       </section>
 
-
-
-      <section>
-        <h1><code>console.time()<br>console.timeEnd()</code></h1>
-        <pre><code class="js" contenteditable>
-console.time('social-construct');
-
-// Multiple timers are totally fine as long as
-// they have different names
-console.time('message')
-console.info('time is a social construct');
-console.timeEnd('message')
-
-setTimeout(_ => {
-  console.info('%c...or is it?', 'font-style: italic');
-  console.timeEnd('social-construct');
-}, 2000)
-        </code></pre>
-      </section>
-
-
-
-      <section>
-        <h1><code>console.table()</code></h1>
-        <h2>Sortable data in the console</h2>
-        <pre><code class="js" contenteditable>
-// Remember to turn on async stack traces
-
-fetch('albums.json')
-  .then(response => response.json())
-  .then(albums => {
-    // Show everything
-    console.table(albums);
-
-    // Show only selected fields
-    console.table(albums, ['year']);
-  })
-  .catch(e => console.error(e))
-        </code></pre>
-        <aside>This uses the new <code>fetch</code> API which is way easier in simple cases than XHR, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">check out the docs on MDN</a>
-      </section>
-
-
-
-      <section>
-        <h1>💸 Cache Problems 💸</h1>
-        <ul>
-          <li>Network tab → Disable cache</li>
-          <li>Application tab → Clear storage</li>
-        </ul>
-        <aside>Especially useful when working with responsive images</aside>
-      </section>
-
-
-
-
-      <section>
-        <h1><code>debugger</code></h1>
-        <pre><code class="js" contenteditable>
-// This program is broken, let's find out why
-let foo = function(input) {
-  console.info('entering foo, once again');
-  bar(`${input} ${input}`);
-}
-
-let bar = function(input) {
-  console.info('entering bar, pump up the world');
-  let parts = input.split(' ');
-  parts.push(parts[0]);
-  baz(parts.join(' '));
-}
-
-let baz = function(input) {
-  console.info('entering baz, watch my flow');
-
-  console.log(`🎶 ${input} you know that I'll be back 🎶`);
-}
-
-foo('return of the mack');
-        </code></pre>
-      </section>
-
-
-      <section>
-        <h1>Pause On Exception</h1>
-        <pre><code class="js" contenteditable>
-  // Make sure to turn on Pause on Exception first
-  let x = {howDoWeDoIt: this};
-
-  console.log('this is gonna happen');
-
-  undefined('i bet this is a function');
-
-  console.log('never gonna get here');
-        </code></pre>
-
-        <aside>
-          Here's where it's not useful: when the libraries you are using are
-          flagrant about letting exceptions run wild. blackboxing
-          can fix that.
-        </aside>
-      </section>
-
-
-
-      <section>
-        <h1><code>console.assert()</code></h1>
-        <pre><code class="js" contenteditable>
-let x = {howDoWeDoIt: this};
-
-console.assert(1 == 1, 'somehow math stopped working');
-
-console.assert(1 == 2, 'yep I guess math did stop working');
-
-console.log('assert does not cause abrupt completion');
-        </code></pre>
-
-        <aside>
-          Currently triggers Pause On Exception in Chrome, Safari; not
-          in Firefox. I'm trying to fix that, see "standardization"
-          section.
-        </aside>
-      </section>
-
-
-
-      <section>
-        <h1>Event Listener Breakpoints</h1>
-        <pre><code class="js" contenteditable>
-document.body.addEventListener('mouseup', event => {
-  // remember to go into the Sources tab and turn on the mouseup
-  // event listener breakpoint. When it breaks, execution will be
-  // paused within this context.
-  let time = Date.now();
-  let element = event.target;
-  console.log(`${time}: %O`, element);
-});
-console.info('event listener added');
-        </code></pre>
-      </section>
-
-
-
-      <section>
-        <h1><code>blackboxing</code></h1>
-        <pre><code class="js" contenteditable>
-// This function is provided by the hot new 10x framework, 'chaos.js'.
-// It flips a coin and `throws` some unwanted saxophones on heads
-
-// To blackbox this dumb, dumb script, go to devtools settings,
-// look for "blackboxing" on the right navigation.
-chaos();
-        </code></pre>
-      </section>
-
-
       <section>
         <h1>Standardization</h1>
 
@@ -404,11 +521,10 @@ chaos();
         </p>
       </section>
 
+
       <section>
         <h1>Also see<br><code><a href="https://github.com/node-inspector/node-inspector">node-inspector</a></code></h1>
       </section>
-
-      <center>💗</center>
 
     </div>
 
